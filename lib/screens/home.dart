@@ -1,8 +1,14 @@
+import 'dart:async';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:primeseek/screens/interiordecors.dart';
 import 'package:primeseek/screens/screen2.dart';
+import 'package:primeseek/screens/search.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,7 +18,80 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String _locationData = 'Location will be updated automatically';
+  Position? _currentPosition;
+  String? _currentCity;
+
   @override
+  void initState() {
+    super.initState();
+    _startLocationUpdates();
+  }
+
+  void _startLocationUpdates() {
+    const Duration updateInterval = Duration(seconds: 15);
+
+    _getCurrentLocation();
+
+    Timer.periodic(updateInterval, (Timer timer) {
+      _getCurrentLocation();
+    });
+  }
+
+  void _getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        _currentPosition = position;
+        _locationData = 'Last updated: ${DateTime.now()}';
+      });
+
+      // Access the latitude and longitude from the position
+      double latitude = _currentPosition?.latitude ?? 0.0;
+      double longitude = _currentPosition?.longitude ?? 0.0;
+
+      print('Latitude: $latitude, Longitude: $longitude');
+
+      // Now you can use these latitude and longitude values as needed.
+      // If you want to update the city based on these coordinates, you can use the geocoding package as shown in the previous example.
+      _getCityName(latitude, longitude);
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> _getCityName(double latitude, double longitude) async {
+    try {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+        setState(() {
+          _currentCity = place.locality ?? 'City Not Found';
+        });
+      } else {
+        setState(() {
+          _currentCity = 'City Not Found';
+        });
+      }
+    } catch (e) {
+      print('Error: $e');
+      setState(() {
+        _currentCity = 'Error fetching city';
+      });
+    }
+  }
+
+  final List<String> imageUrls = [
+    'https://media.istockphoto.com/id/1371312054/photo/air-condition-outdoor-unit-compressor-install-outside-the-building.jpg?s=612x612&w=0&k=20&c=GZYyRWF87lSQIzaeKs9u2wQ8QGtt7Vz-7GYH_WKKScM=',
+    'https://www.thestatesman.com/wp-content/uploads/2017/08/1487584282-water-supply.-getty.jpg',
+    'https://t4.ftcdn.net/jpg/00/68/63/23/360_F_68632352_kmHLwFc2rQLmnKqn6gM0bhOPqxRTx8sY.jpg',
+  ];
+
   Widget build(BuildContext context) {
     ScreenUtil.init(context);
     return SafeArea(
@@ -32,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 8.0,
                 ),
                 Text(
-                  'Location ...',
+                  '$_currentCity',
                   style: GoogleFonts.reemKufi(
                       color: Colors.black,
                       fontSize: 20.0,
@@ -47,30 +126,68 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: 'Search for a location',
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.grey,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => SearchLocation()));
+                  },
+                  child: Container(
+                      child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      border: Border.all(color: Colors.grey, width: 2),
                     ),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        borderSide:
-                            BorderSide(style: BorderStyle.solid, width: 2)),
-                  ),
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.search,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(width: 10.0),
+                        Expanded(
+                          child: Text(
+                            'Search for a location',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 17),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
                 ),
               ),
               SizedBox(
-                height: 10.0,
+                height: 15.0,
               ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 250.0,
-                color: Colors.white70,
-                child: Image.network(
-                  'https://media.istockphoto.com/id/1371312054/photo/air-condition-outdoor-unit-compressor-install-outside-the-building.jpg?s=612x612&w=0&k=20&c=GZYyRWF87lSQIzaeKs9u2wQ8QGtt7Vz-7GYH_WKKScM=',
-                  width: MediaQuery.of(context).size.width,
+              CarouselSlider(
+                items: imageUrls.map((imageUrl) {
+                  return Builder(
+                    builder: (BuildContext context) {
+                      return GestureDetector(
+                        onTap: () {
+                          // Handle the tap event if needed
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          margin: EdgeInsets.symmetric(horizontal: 5.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            image: DecorationImage(
+                              image: NetworkImage(imageUrl),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }).toList(),
+                options: CarouselOptions(
+                  height: 200.0,
+                  enlargeCenterPage: true,
+                  autoPlay: true,
                 ),
               ),
               SizedBox(
@@ -96,13 +213,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                height: 145, // Set the height as needed
+                child: ListView(
+                  padding: EdgeInsets.symmetric(horizontal: 10.0),
+                  scrollDirection: Axis.horizontal,
                   children: [
                     ServiceProvider(
                       icon: Icons.bolt,
                       name: 'Electrician',
                     ),
+
                     ServiceProvider(
                       icon: Icons.water_drop,
                       name: 'Plumber',
@@ -115,6 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       icon: Icons.construction,
                       name: 'Construction',
                     ),
+                    // Add more ServiceProvider widgets as needed
                   ],
                 ),
               ),
@@ -141,12 +262,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                height: 145, // Set the height as needed
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
                   children: [
                     ServiceProvider(
-                      icon: Icons.water_drop,
-                      name: 'Plumber',
+                      icon: Icons.cleaning_services,
+                      name: 'Interior Decors',
                     ),
                     ServiceProvider(
                       icon: Icons.bolt,
@@ -157,9 +279,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       name: 'Construction',
                     ),
                     ServiceProvider(
-                      icon: Icons.cleaning_services,
-                      name: 'House Keeping',
+                      icon: Icons.bolt,
+                      name: 'Plumber,',
                     ),
+                    // Add more ServiceProvider widgets as needed
                   ],
                 ),
               ),
@@ -186,8 +309,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                height: 145,
+                // Set the height as needed
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  reverse: true, // Set reverse to true
                   children: [
                     ServiceProvider(
                       icon: Icons.cleaning_services,
@@ -205,6 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       icon: Icons.construction,
                       name: 'Construction',
                     ),
+                    // Add more ServiceProvider widgets as needed
                   ],
                 ),
               ),
@@ -242,21 +369,52 @@ class _ServiceProviderState extends State<ServiceProvider> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Container(
-          child: Column(
-            children: [
-              Icon(
-                widget.icon,
-                color: Colors.black,
-                size: 30,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 3), // changes position of shadow
               ),
-              SizedBox(
-                height: 5.0,
-              ),
-              Text(
-                '${widget.name}',
-                style: GoogleFonts.inriaSans(fontWeight: FontWeight.w700),
-              )
             ],
+          ),
+          child: InkWell(
+            onTap: () {
+              if (widget.name == 'Interior Decors') {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => InteriorDecors()));
+              } else {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => Screen2()));
+              }
+            },
+            child: Container(
+              height: 100,
+              width: 100,
+              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    widget.icon,
+                    color: Colors.black,
+                    size: 45,
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Text(
+                    '${widget.name}',
+                    style: GoogleFonts.inriaSans(fontWeight: FontWeight.w700),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
