@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -213,28 +214,34 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 145, // Set the height as needed
+                height: 145,
+                // Set the height as needed
                 child: ListView(
-                  padding: EdgeInsets.symmetric(horizontal: 10.0),
                   scrollDirection: Axis.horizontal,
+                  reverse: true, // Set reverse to true
                   children: [
                     ServiceProvider(
-                      icon: Icons.bolt,
-                      name: 'Electrician',
+                      icon: Icons.construction,
+                      name: 'Construction',
+                      colr: Colors.black,
                     ),
 
                     ServiceProvider(
                       icon: Icons.water_drop,
                       name: 'Plumber',
+                      colr: Colors.blue.shade700,
                     ),
                     ServiceProvider(
                       icon: Icons.cleaning_services,
                       name: 'House Keeping',
+                      colr: Colors.green,
                     ),
                     ServiceProvider(
-                      icon: Icons.construction,
-                      name: 'Construction',
+                      icon: Icons.bolt,
+                      name: 'Electrician',
+                      colr: Colors.yellow.shade700,
                     ),
+
                     // Add more ServiceProvider widgets as needed
                   ],
                 ),
@@ -260,30 +267,39 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 height: 8.0,
               ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 145, // Set the height as needed
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    ServiceProvider(
-                      icon: Icons.cleaning_services,
-                      name: 'Interior Decors',
-                    ),
-                    ServiceProvider(
-                      icon: Icons.bolt,
-                      name: 'Electrician',
-                    ),
-                    ServiceProvider(
-                      icon: Icons.construction,
-                      name: 'Construction',
-                    ),
-                    ServiceProvider(
-                      icon: Icons.bolt,
-                      name: 'Plumber,',
-                    ),
-                    // Add more ServiceProvider widgets as needed
-                  ],
+              SingleChildScrollView(
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 275,
+                  // Set the height as needed
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    reverse: true, // Set reverse to true
+                    children: [
+                      AdvServiceProvider(
+                        icon: Icons.cleaning_services,
+                        name: 'House Keeping',
+                        colr: Colors.green,
+                      ),
+
+                      AdvServiceProvider(
+                        icon: Icons.water_drop,
+                        name: 'Plumber',
+                        colr: Colors.blue.shade700,
+                      ),
+                      AdvServiceProvider(
+                        icon: Icons.bolt,
+                        name: 'Electrician',
+                        colr: Colors.yellow.shade700,
+                      ),
+                      AdvServiceProvider(
+                        icon: Icons.construction,
+                        name: 'Construction',
+                        colr: Colors.black,
+                      ),
+                      // Add more ServiceProvider widgets as needed
+                    ],
+                  ),
                 ),
               ),
               SizedBox(
@@ -318,18 +334,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     ServiceProvider(
                       icon: Icons.cleaning_services,
                       name: 'House Keeping',
+                      colr: Colors.green,
                     ),
                     ServiceProvider(
                       icon: Icons.bolt,
                       name: 'Electrician',
+                      colr: Colors.yellow.shade700,
                     ),
                     ServiceProvider(
                       icon: Icons.water_drop,
                       name: 'Plumber',
+                      colr: Colors.blue.shade700,
                     ),
                     ServiceProvider(
                       icon: Icons.construction,
                       name: 'Construction',
+                      colr: Colors.black,
                     ),
                     // Add more ServiceProvider widgets as needed
                   ],
@@ -347,13 +367,11 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class ServiceProvider extends StatefulWidget {
-  ServiceProvider({
-    super.key,
-    required this.name,
-    required this.icon,
-  });
+  ServiceProvider(
+      {super.key, required this.name, required this.icon, required this.colr});
   String name;
   IconData icon;
+  Color colr;
   @override
   State<ServiceProvider> createState() => _ServiceProviderState();
 }
@@ -392,8 +410,8 @@ class _ServiceProviderState extends State<ServiceProvider> {
               }
             },
             child: Container(
-              height: 100,
-              width: 100,
+              height: 130,
+              width: 125,
               padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -401,7 +419,81 @@ class _ServiceProviderState extends State<ServiceProvider> {
                 children: [
                   Icon(
                     widget.icon,
-                    color: Colors.black,
+                    color: widget.colr,
+                    size: 45,
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  Text(
+                    '${widget.name}',
+                    style: GoogleFonts.inriaSans(fontWeight: FontWeight.w700),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AdvServiceProvider extends StatefulWidget {
+  AdvServiceProvider(
+      {super.key, required this.name, required this.icon, required this.colr});
+  String name;
+  IconData icon;
+  Color colr;
+  @override
+  State<AdvServiceProvider> createState() => _AdvServiceProviderState();
+}
+
+class _AdvServiceProviderState extends State<AdvServiceProvider> {
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => Screen2()));
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ],
+          ),
+          child: InkWell(
+            onTap: () {
+              if (widget.name == 'Interior Decors') {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => InteriorDecors()));
+              } else {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => Screen2()));
+              }
+            },
+            child: Container(
+              height: 300,
+              width: 150,
+              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Icon(
+                    widget.icon,
+                    color: widget.colr,
                     size: 45,
                   ),
                   SizedBox(

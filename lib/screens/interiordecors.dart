@@ -60,11 +60,11 @@ class _InteriorDecorsState extends State<InteriorDecors> {
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              labelText: 'Length in cm',
+                              labelText: 'Length in ft',
                               labelStyle: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold),
-                              hintText: 'Enter Length in cm',
+                              hintText: 'Enter Length in ft',
                             ),
                           ),
                         ),
@@ -91,11 +91,11 @@ class _InteriorDecorsState extends State<InteriorDecors> {
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              labelText: 'Width in cm',
+                              labelText: 'Width in ft',
                               labelStyle: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold),
-                              hintText: 'Enter Width in cm',
+                              hintText: 'Enter Width in ft',
                             ),
                           ),
                         ),
@@ -122,11 +122,11 @@ class _InteriorDecorsState extends State<InteriorDecors> {
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              labelText: 'Height in cm',
+                              labelText: 'Height in ft',
                               labelStyle: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold),
-                              hintText: 'Enter height in cm',
+                              hintText: 'Enter height in ft',
                             ),
                           ),
                         ),

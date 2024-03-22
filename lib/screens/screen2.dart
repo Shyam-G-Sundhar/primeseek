@@ -13,10 +13,17 @@ class _Screen2State extends State<Screen2> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
-        child: Text(
-          'Under Development',
-          style: TextStyle(fontSize: 30),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Center(
+          child: Text(
+            'Service will be Opened Soon ...',
+            style: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.w700,
+            ),
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );
